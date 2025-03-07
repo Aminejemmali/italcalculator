@@ -3,6 +3,11 @@ import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+
+
+import { DocumentDownloadIcon } from '@heroicons/react/outline'; // Import the download icon
 
 export default function EstimationHistory() {
   const { currentUser } = useAuth();
@@ -23,23 +28,19 @@ export default function EstimationHistory() {
         );
         
         const querySnapshot = await getDocs(q);
-        console.log("Fetched documents:", querySnapshot.size);
         
         const estimationsList = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          console.log("Document data:", data);
           return {
             id: doc.id,
             ...data,
             createdAt: data.createdAt?.toDate() || new Date(),
-            // Ensure materials is always treated as an array even if it's an object in Firestore
             materials: Array.isArray(data.materials) 
               ? data.materials 
               : Object.keys(data.materials || {}).map(key => data.materials[key])
           };
         });
         
-        console.log("Processed estimations:", estimationsList);
         setEstimations(estimationsList);
       } catch (error) {
         console.error("Error fetching estimations:", error);
@@ -57,6 +58,30 @@ export default function EstimationHistory() {
     setSelectedEstimation(estimation === selectedEstimation ? null : estimation);
   };
 
+  const downloadEstimation = (estimation) => {
+    const doc = new jsPDF();
+    
+    doc.text("Estimation Details", 14, 20);
+    doc.text(`Product Name: ${estimation.productName}`, 14, 30);
+    doc.text(`Created At: ${format(estimation.createdAt, 'MMM d, yyyy • h:mm a')}`, 14, 40);
+    doc.text(`Total Cost: $${parseFloat(estimation.totalCost).toFixed(2)}`, 14, 50);
+
+    const materialsData = estimation.materials.map((material) => [
+      material.name,
+      material.quantity + " " + material.unit,
+      "$" + parseFloat(material.unitPrice).toFixed(2),
+      "$" + parseFloat(material.subtotal).toFixed(2)
+    ]);
+    
+    autoTable(doc, {
+      head: [['Material', 'Quantity', 'Unit Price', 'Subtotal']],
+      body: materialsData,
+      startY: 60
+    });
+
+    doc.save(`${estimation.productName}_Estimation.pdf`);
+  };
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto py-6">
@@ -72,7 +97,6 @@ export default function EstimationHistory() {
     );
   }
 
-  // Debug section - only for development
   if (estimations.length === 0) {
     return (
       <div className="max-w-7xl mx-auto py-6">
@@ -84,13 +108,6 @@ export default function EstimationHistory() {
             </svg>
             <h3 className="mt-2 text-lg font-medium text-gray-900">No estimations found</h3>
             <p className="mt-1 text-gray-500">You haven't created any cost estimations yet.</p>
-          </div>
-          
-          {/* User ID debug - remove in production */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Debug Info:</h4>
-            <p className="text-xs text-gray-600">Current User ID: {currentUser?.uid || 'Not authenticated'}</p>
-            <p className="text-xs text-gray-600 mt-1">If you have documents in the database but none are showing up, ensure the userId field in your Firestore documents matches the current user's ID.</p>
           </div>
         </div>
       </div>
@@ -125,14 +142,16 @@ export default function EstimationHistory() {
                     </div>
                   </div>
                   <div>
-                    <svg 
-                      className={`h-5 w-5 text-gray-400 transform transition-transform duration-200 ${selectedEstimation === estimation ? 'rotate-180' : ''}`} 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 20 20" 
-                      fill="currentColor"
+                    <button
+                      className="text-indigo-600 hover:text-indigo-800 flex items-center space-x-2"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent view toggle
+                        downloadEstimation(estimation);
+                      }}
                     >
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                      <DocumentDownloadIcon className="h-5 w-5" />
+                      <span>Download</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -170,22 +189,12 @@ export default function EstimationHistory() {
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                               ${parseFloat(material.unitPrice).toFixed(2)}
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                               ${parseFloat(material.subtotal).toFixed(2)}
                             </td>
                           </tr>
                         ))}
                       </tbody>
-                      <tfoot className="bg-gray-50">
-                        <tr>
-                          <th scope="row" colSpan="3" className="px-4 py-3 text-left text-sm font-medium text-gray-900">
-                            Total
-                          </th>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-indigo-600">
-                            ${parseFloat(estimation.totalCost).toFixed(2)}
-                          </td>
-                        </tr>
-                      </tfoot>
                     </table>
                   </div>
                 </div>

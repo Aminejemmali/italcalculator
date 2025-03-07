@@ -21,7 +21,7 @@ function App() {
           <MaterialProvider>
             <div className="min-h-screen bg-gray-50">
               <FloatingNavbar />
-              <div className="pt-16 pb-12 px-4 sm:px-6 lg:px-8">
+              <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
