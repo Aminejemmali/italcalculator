@@ -55,7 +55,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
               <div className="mt-2 sm:flex sm:justify-between">
                 <div className="sm:flex">
                   <p className="flex items-center text-sm text-gray-500">
-                    Created on {product.createdAt instanceof Date ? format(product.createdAt, 'MMM dd, yyyy') : 'Just now'}
+                    Created on {product.createdAt ? format(product.createdAt.toDate(), 'MMM dd, yyyy • h:mm a') : 'Just now'}
                   </p>
                 </div>
               </div>
