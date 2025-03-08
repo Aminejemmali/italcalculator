@@ -189,7 +189,7 @@ export default function Calculator() {
                               <option value="">-- Select material --</option>
                               {materials.map((material) => (
                                 <option key={material.id} value={material.id}>
-                                  {material.name} (${material.price.toFixed(2)}/{material.unit})
+                                  {material.name} (DT HT {material.price.toFixed(2)}/{material.unit})
                                 </option>
                               ))}
                             </select>
@@ -215,7 +215,7 @@ export default function Calculator() {
                               Subtotal
                             </label>
                             <div className="py-2 px-3 bg-gray-100 rounded-md text-sm font-medium">
-                              ${subtotal.toFixed(2)}
+                              DT HT {subtotal.toFixed(2)}
                             </div>
                           </div>
                           
@@ -241,7 +241,7 @@ export default function Calculator() {
             <div className="mt-8 border-t border-gray-200 pt-6">
               <div className="flex justify-between">
                 <h2 className="text-lg font-medium text-gray-900">Total Estimated Cost</h2>
-                <p className="text-2xl font-bold text-indigo-600">${totalCost.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-indigo-600">DT HT {totalCost.toFixed(2)}</p>
               </div>
               
               <div className="mt-6 flex justify-end">

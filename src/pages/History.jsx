@@ -64,13 +64,13 @@ export default function EstimationHistory() {
     doc.text("Estimation Details", 14, 20);
     doc.text(`Product Name: ${estimation.productName}`, 14, 30);
     doc.text(`Created At: ${format(estimation.createdAt, 'MMM d, yyyy • h:mm a')}`, 14, 40);
-    doc.text(`Total Cost: $${parseFloat(estimation.totalCost).toFixed(2)}`, 14, 50);
+    doc.text(`Total Cost: DT HT ${parseFloat(estimation.totalCost).toFixed(2)}`, 14, 50);
 
     const materialsData = estimation.materials.map((material) => [
       material.name,
       material.quantity + " " + material.unit,
-      "$" + parseFloat(material.unitPrice).toFixed(2),
-      "$" + parseFloat(material.subtotal).toFixed(2)
+      "DT HT " + parseFloat(material.unitPrice).toFixed(2),
+      "DT HT " + parseFloat(material.subtotal).toFixed(2)
     ]);
     
     autoTable(doc, {
@@ -137,7 +137,7 @@ export default function EstimationHistory() {
                           {estimation.createdAt ? format(estimation.createdAt, 'MMM d, yyyy • h:mm a') : 'Unknown date'}
                         </span>
                         <span className="mx-2 text-gray-500">•</span>
-                        <span className="text-sm font-medium text-indigo-600">${parseFloat(estimation.totalCost).toFixed(2)}</span>
+                        <span className="text-sm font-medium text-indigo-600">DT HT {parseFloat(estimation.totalCost).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -187,10 +187,10 @@ export default function EstimationHistory() {
                               {material.quantity} {material.unit}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                              ${parseFloat(material.unitPrice).toFixed(2)}
+                              DT HT {parseFloat(material.unitPrice).toFixed(2)}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                              ${parseFloat(material.subtotal).toFixed(2)}
+                              DT HT {parseFloat(material.subtotal).toFixed(2)}
                             </td>
                           </tr>
                         ))}

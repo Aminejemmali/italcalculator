@@ -46,7 +46,7 @@ export default function MaterialList({ materials, onEdit, onDelete }) {
                 <div className="text-sm text-gray-500">{material.unit}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">${material.price.toFixed(2)}</div>
+                <div className="text-sm text-gray-900">DT HT {material.price.toFixed(2)}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {material.createdAt instanceof Date ? format(material.createdAt, 'MMM dd, yyyy') : 'Just now'}

@@ -1,6 +1,6 @@
 {
   "name": "italcalculator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@date-fns/tz": "^1.2.0",

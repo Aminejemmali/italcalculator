@@ -75,7 +75,7 @@ export default function MaterialForm({ material, onClose, onSubmit }) {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm">$</span>
+                  <span className="text-gray-500 sm:text-sm">DT HT</span>
                 </div>
                 <input
                   type="number"
@@ -83,7 +83,7 @@ export default function MaterialForm({ material, onClose, onSubmit }) {
                   id="price"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="block w-full pl-7 pr-12 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="block w-full pl-16 pr-12 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="0.00"
                   step="0.01"
                   min="0.01"
