@@ -4,6 +4,7 @@ import { useMaterials } from '../contexts/MaterialContext';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import Select from 'react-select'; // Import react-select
 
 export default function Calculator() {
   const { products, loading: productsLoading } = useProducts();
@@ -14,6 +15,22 @@ export default function Calculator() {
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
   const [savingEstimation, setSavingEstimation] = useState(false);
+  
+  // Format materials for react-select
+  const materialOptions = materials.map(material => ({
+    value: material.id,
+    label: `${material.name} (DT HT ${material.price.toFixed(2)}/${material.unit})`,
+    price: material.price,
+    unit: material.unit,
+    name: material.name
+  }));
+
+  // Format products for react-select
+  const productOptions = products.map(product => ({
+    value: product.id,
+    label: product.name,
+    name: product.name
+  }));
   
   // Reset selected materials when product changes
   useEffect(() => {
@@ -26,12 +43,12 @@ export default function Calculator() {
     calculateTotalCost();
   }, [selectedMaterials]);
   
-  const handleProductChange = (e) => {
-    setSelectedProduct(e.target.value);
+  const handleProductChange = (selectedOption) => {
+    setSelectedProduct(selectedOption ? selectedOption.value : '');
   };
   
   const handleAddMaterial = () => {
-    setSelectedMaterials([...selectedMaterials, { materialId: '', quantity: 1 }]);
+    setSelectedMaterials([...selectedMaterials, { materialId: '', quantity: 1, materialOption: null }]);
   };
   
   const handleRemoveMaterial = (index) => {
@@ -42,7 +59,14 @@ export default function Calculator() {
   
   const handleMaterialChange = (index, field, value) => {
     const updatedMaterials = [...selectedMaterials];
-    updatedMaterials[index][field] = value;
+    
+    if (field === 'materialOption') {
+      updatedMaterials[index].materialOption = value;
+      updatedMaterials[index].materialId = value ? value.value : '';
+    } else {
+      updatedMaterials[index][field] = value;
+    }
+    
     setSelectedMaterials(updatedMaterials);
   };
   
@@ -132,23 +156,20 @@ export default function Calculator() {
       
       <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
         <div className="mb-6">
-          <label htmlFor="product" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="product" className="block text-sm font-medium text-gray-700 mb-1">
             Select Product
           </label>
-          <select
+          {/* Replace standard select with react-select for products */}
+          <Select
             id="product"
             name="product"
-            value={selectedProduct}
+            options={productOptions}
             onChange={handleProductChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          >
-            <option value="">-- Select a product --</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
+            isClearable
+            placeholder="-- Select a product --"
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
         
         {selectedProduct && (
@@ -180,19 +201,18 @@ export default function Calculator() {
                             <label htmlFor={`material-${index}`} className="block text-xs font-medium text-gray-500 mb-1">
                               Material
                             </label>
-                            <select
+                            {/* Replace standard select with react-select for materials */}
+                            <Select
                               id={`material-${index}`}
-                              value={item.materialId}
-                              onChange={(e) => handleMaterialChange(index, 'materialId', e.target.value)}
-                              className="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-                            >
-                              <option value="">-- Select material --</option>
-                              {materials.map((material) => (
-                                <option key={material.id} value={material.id}>
-                                  {material.name} (DT HT {material.price.toFixed(2)}/{material.unit})
-                                </option>
-                              ))}
-                            </select>
+                              value={item.materialOption}
+                              onChange={(option) => handleMaterialChange(index, 'materialOption', option)}
+                              options={materialOptions}
+                              isClearable
+                              isSearchable
+                              placeholder="-- Search material --"
+                              className="react-select-container"
+                              classNamePrefix="react-select"
+                            />
                           </div>
                           
                           <div className="col-span-3">
